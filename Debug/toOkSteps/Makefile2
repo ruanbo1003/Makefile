@@ -1,0 +1,28 @@
+
+
+#中间文件(.o)
+SrcDir = /home/ruanbo/Codes/MakefileTest
+CppPathFiles = $(wildcard $(SrcDir)/*.cpp)
+CppFiles = $(notdir $(CppPathFiles))
+Objfiles = $(patsubst %.cpp,%.o,$(CppFiles)) 
+
+
+mft:$(Objfiles)
+	@echo $(CppFiles)
+	@echo $(Objfiles)
+	gcc -o mft $(Objfiles)
+
+main.o:$(SrcDir)/main.cpp
+	gcc -c $(SrcDir)/main.cpp
+
+file.o:$(SrcDir)/file.cpp
+	gcc -c $(SrcDir)/file.cpp
+
+net.o:$(SrcDir)/net.cpp
+	gcc -c $(SrcDir)/net.cpp
+
+clean:
+	rm mft $(Objfiles)
+
+
+

@@ -1,0 +1,116 @@
+
+#中间文件(.o)
+o_files = main.o file.o net.o
+
+#自定义函数
+define dir_funcs
+	@echo dir_funcs begin
+	@echo "this function name:$0"   # "this function name:dir_funcs"  $0：函数名
+	@echo "parameters:$1"           # "parameters:param1 param2"      $1:所有的参数
+	@echo "$(1) $(2)"               # "param1 param2"                 $(1)，$(2):第1,2个参数
+	
+	#dir:取目录函数，(dir path_file1 path_file2)，返回各个文件的目录
+	@echo $(dir main.cpp /home/ruanbo/Codes/Log.hpp)    # "./ /home/ruanbo/Codes/"
+	
+	#notdir:取文件名目录，(notdir path_file1 path_file2)，返回各个文件的文件名
+	@echo $(notdir main.cpp /home/ruanbo/Codes/Log.hpp)  # "main.cpp Log.hpp"
+	
+	#suffix:取后缀函数，(suffix path_file1 path_file2)，返回各个文件的后缀名，如果没有后缀，就返回空字符
+	@echo $(suffix main.cpp /home/ruanbo/Codes/Log.hpp)  # ".cpp .hpp"
+	
+	#basename:取前缀名函数，(basename path_file1 path_fiel2),返回各个文件的前缀
+	@echo $(basename main.cpp /home/ruanbo/Codes/Log.hpp) # "main /home/ruanbo/Codes/Log
+	
+	#addsuffix:加后缀名函数，(addsuffix <suffix>,file1 file2)"，给各个文件加后缀名，返回加过后缀的各个文件名
+	@echo $(addsuffix .cpp,main /home/ruanbo/Codes/Log)   # "main.cpp /home/ruanbo/Codes/Log.cpp"
+	
+	#addprefix:加前缀函数, (addprefix <prefix>,file1 file2)，给各个文件加前缀，返回加过前缀的各个文件名
+	@echo $(addprefix prefix_floder/,main.cpp Log.hpp)    # "prefix_floder/main.cpp prefix_floder/Log.hpp"
+	
+	#join:连接函数，(join,<list11 list12>,<list21,list22>)
+	#返回：先将list1/list2中的单词一一对应的连接起来，多出来的单独加到后面
+	@echo $(join aa bb,11 22 33)  # "aa11 bb22 33"
+	@echo $(join aa bb cc,11 22)  # "aa11 bb22 cc"
+	
+	#foreach:循环函数，(foreach <var>,<list>,<text>)，
+	#  将list中的单词逐一取出来放到参数<var>的变量中，然后在执行<text>表达式，每一次<text>都会返回一个字符串，循环过程中，<text>所返回的字符会以空格隔开，
+	#循环结束时，<text>所返回的每个字符组成的字符串就是 foreach 的返回值
+	@echo $(foreach item,a b c d,$(item).cpp)   # "a.cpp b.cpp c.cpp d.cpp"
+	
+	@echo end of dir_funcs
+endef
+
+#字符串处理函数
+define string_funcs
+	#字符串替换函数，(subst <from>,<to>,<text>) : 将text中的from字符替换为to，返回替换后的字符
+	@echo $(subst world,cpp,"hello world")  # "hello cpp"
+	
+	#字符串模式匹配替换
+	#(patsubst <pattern>,<replaement>,<text>); 将符合模式pattern的替换为 replacement，返回替换后的字符
+	@echo $(patsubst %.cpp,%.cpp_bakeup,main.cpp Log.cpp)  # main.cpp_bakeup Log.cpp_bakeup
+	
+	#strip:去掉字符串开头和结尾的空字符， (strip, hello world )，返回去掉首尾空格的字符串
+	@echo "hello world "
+	@echo "$(strip hello world )"          # "hello world"
+	
+	#findstring:字符串查找，(findstring <find>,<text>), 在text中查找find，找到则返回find，找不到则返回空字符串
+	@echo $(findstring hello, helloworld)  # "hello"
+	@echo $(findstring cpp,helloworld)     # ""
+	
+	#filter:过滤函数(filter <pattern,pattern2>,<text>),以pattern过滤<text>字符串中的单词，保留符合模式的单词，可以有多个模式，返回符合模式的字符
+	@echo $(filter %.c,main.c main.cpp Log.c)  # main.c Log.c
+	@echo $(filter %.c,main.c main.cpp Log.c)
+	
+	#filter-out:反过滤函数(filter-out <pattern1,pattern2>,<text>)，与filter相反，返回不符合模式的字符
+	@echo $(filter-out %.c,main.c main.cpp Log.c) # main.cpp
+	
+	#sort:排序函数 (sort str1 str2 str4 str3 str2)，按升序排序，会去掉list中重复的单词，返回排序后的单词list
+	@echo $(sort str1 str2 str4 str3 str2)        # "str1 str2 str3 str4
+	
+	#word:取单词函数，(word N,word1 word2 word3) ,取word list中的第N个单词（从1开始）
+	@echo $(word 2,word1 word2 word3 word4)       # "word2"
+endef
+
+
+#常用函数
+define comm_funcs
+	#wildcard:(wildcard pattern)
+	#一般用wildcard来获取工作目录下的所有.c/.cpp文件列表
+	@echo $(wildcard *.cpp)                         # "net.cpp file.cpp main.cpp"
+	@echo $(patsubst %.cpp,%.o, $(wildcard *.cpp))  # "net.o file.o main.o"
+endef
+
+
+#常见变量
+define comm_vals
+	#VPATH
+	@echo $(VPATH)
+	
+	@echo $@   # "mft"
+	@echo $^   # "main.o file.o net.o"
+endef
+
+
+mft:$(o_files)
+	@echo 开始编译
+	@echo $(dir main.cpp)
+	@echo $(notdir /home/ruanbo/Codes/MakefileTest/main.cpp Log.hpp)
+	#自定义函数的调用：$(call 函数名,参数1,参数2), call与函数名之间用空格隔开，函数与参数用逗号隔开
+	#$(call dir_funcs,param1 param2)
+	#$(call string_funcs)
+	#$(call comm_funcs)
+	$(comm_vals)
+	gcc -o mft $(o_files)
+
+main.o:Log.hpp test_head.hpp
+	gcc -c main.cpp
+
+file.o:Log.hpp
+	gcc -c file.cpp
+
+net.o:Log.hpp
+	gcc -c net.cpp
+
+.PHONY:clean
+clean:
+	-rm mft $(o_files)

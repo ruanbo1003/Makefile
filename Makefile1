@@ -1,0 +1,16 @@
+
+
+mft:main.o file.o net.o
+	gcc -o mft main.o file.o net.o
+
+main.o:main.cpp Log.hpp test_head.hpp
+	gcc -c main.cpp
+
+file.o:file.cpp Log.hpp
+	gcc -c file.cpp
+
+net.o:net.cpp Log.hpp
+	gcc -c net.cpp
+
+clean:
+	rm mft main.o file.o net.o

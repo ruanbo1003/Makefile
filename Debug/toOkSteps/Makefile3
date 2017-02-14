@@ -1,0 +1,29 @@
+
+
+#中间文件(.o)
+SrcDir = /home/ruanbo/Codes/MakefileTest
+CppPathFiles = $(wildcard $(SrcDir)/*.cpp)
+CppFiles = $(notdir $(CppPathFiles))
+Objfiles = $(patsubst %.cpp,%.o,$(CppFiles)) 
+
+SubDirs = $(shell ls -l $(SrcDir) | grep ^d | awk {'if($$9 != "Debug") print $$9'})
+
+mft:$(Objfiles)
+	@echo $(CppFiles)
+	@echo $(Objfiles)
+	gcc -o mft $(Objfiles)
+
+# Each subdirectory must supply rules for building sources it contributes
+%.o: $(SrcDir)/%.cpp
+	@echo 'Building file: $<, [$@],[$^]'
+	@echo 'SubDirs:' $(SubDirs)
+	gcc -c $<
+	@echo 'Finished building: $<'
+	@echo ' '
+	
+
+clean:
+	rm mft $(Objfiles)
+
+
+
