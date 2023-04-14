@@ -1,4 +1,6 @@
 
+.PHONY: clean
+
 CC = gcc
 
 BUILD_DIR := ./build
@@ -12,13 +14,20 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I, $(INC_DIRS))
 CPPFLAGS := $(INC_FLAGS)
 
+# sanitize: https://github.com/google/sanitizers
+CPPFLAGS += -fsanitize=address
+PLATFORM_OS := $(shell uname)
+ifneq ($(PLATFORM_OS), Darwin)
+	# -fsanitize=leak not support on MacOS
+	CPPFLAGS += -fsanitize=leak -static-libasan
+endif
+
 
 $(TARGET_BIN): $(OBJS)
-	@echo "start compiling..."
+	@echo "start compiling...", $(IS_DEBUG)
 	echo $(SRC_FILES)
-	echo $(OBJS)
 
-	${CC} $(OBJS) -o $@ $(LDFLAGS)
+	${CC} $(OBJS) -o $@ $(CPPFLAGS)
 
 	@echo "compile done..."
 
@@ -29,7 +38,6 @@ $(BUILD_DIR)/%.c.o : %.c
 	$(CC) $(CPPFLAGS) -c $< -o $@
 
 
-.PHONY: clean
 clean:
 	rm -rf $(TARGET_BIN) $(BUILD_DIR)/*
 

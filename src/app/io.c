@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <strings.h>
 #include "data.h"
 
 
@@ -17,7 +18,8 @@ void* io_thread(void* param) {
         sleep(1);
         count += 1;
 
-        char* msg = (char*) malloc(16);
+        char msg[64];
+        bzero(msg, 64);
         sprintf(msg, "%s-%d", data->_thread_name, count);
         add_msg_to_queue(data->_msgs, msg);
     }
