@@ -9,6 +9,7 @@
 
 // time
 int now_seconds();
+void get_time_str(char* str, int len);
 
 // thread
 typedef void* (*thread_func)(void *);
